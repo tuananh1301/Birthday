@@ -23,7 +23,7 @@ Bản tĩnh nằm ở `dist/`. Có thể phục vụ bằng static hosting khi b
 ## Thay ảnh của hai vợ chồng
 
 1. Đặt ảnh vào `public/photos/`, có thể dùng thư mục con.
-2. Hỗ trợ `.jpg`, `.jpeg`, `.png`, `.webp`, `.avif`, không phân biệt hoa/thường. Tên có khoảng trắng và dấu tiếng Việt được mã hóa URL tự động.
+2. Hỗ trợ `.jpg`, `.jpeg`, `.jfif`, `.png`, `.webp`, `.avif`, không phân biệt hoa/thường. Tên có khoảng trắng và dấu tiếng Việt được mã hóa URL tự động.
 3. **Sau khi thêm/xóa ảnh, khởi động lại dev server hoặc build lại.** Script tự sinh `public/photos-manifest.json` trước dev/build; không cần khai báo tên ảnh trong code.
 
 Nếu không tìm thấy ảnh thật, website dùng tám SVG cục bộ trong `public/demo/`. Khi có ảnh thật, manifest chỉ chứa ảnh thật, không trộn demo. Không gửi ảnh lên dịch vụ khác. Khi tự xuất bản, nhớ rằng ảnh trong `public/` sẽ có thể truy cập công khai trên hosting bạn chọn.
@@ -36,7 +36,7 @@ Bố cục mặc định gồm **40 vị trí riêng**: đặt 40 ảnh vào `pu
 
 Sửa **`public/letter.txt`**, lưu mã hóa **UTF-8**. Nội dung, dấu tiếng Việt, dấu câu, xuống dòng và chữ ký được giữ nguyên. Văn bản luôn được hiển thị thuần, kể cả khi có ký tự HTML. Nếu chưa có file, script tạo thư mẫu; script không ghi đè file đã có. Nếu file tồn tại nhưng trống, website giữ đúng nội dung trống đó.
 
-Ký tự được tách bằng `Intl.Segmenter` để dấu tổ hợp đi cùng chữ. Vị trí đích được đo bằng `Range` từ bố cục văn bản thật. Chỉ tối đa 160 ký tự trong vùng nhìn được dựng thành hạt bay để thư dài vẫn nhẹ; sau hiệu ứng toàn bộ văn bản thật hiện ra và cuộn/chọn/copy được. Khi cuộn hoặc đổi kích thước trong lúc ghép chữ, thư hoàn chỉnh hiện ngay để tránh sai vị trí. Trình duyệt thiếu `Intl.Segmenter` và chế độ giảm chuyển động hiển thị thư bằng chuyển cảnh nhẹ.
+Ký tự được tách bằng `Intl.Segmenter` để dấu tổ hợp đi cùng chữ, rồi nhóm thành dòng theo vị trí đo bằng `Range` từ bố cục văn bản thật. Mỗi dòng trong vùng nhìn bay nhẹ vào ngay khi mép cuộn giấy trải tới dòng đó; các dòng phía dưới vẫn ẩn. Tối đa 160 dòng được dựng thành lớp hiệu ứng để thư dài vẫn nhẹ; sau hiệu ứng toàn bộ văn bản thật hiện ra và cuộn/chọn/copy được. Khi cuộn hoặc đổi kích thước trong lúc trải thư, thư hoàn chỉnh hiện ngay để tránh sai vị trí. Trình duyệt thiếu `Intl.Segmenter` và chế độ giảm chuyển động hiển thị thư bằng chuyển cảnh nhẹ.
 
 ## Nhạc nền
 
@@ -51,7 +51,7 @@ Nếu trình duyệt chặn phát nhạc hoặc file tải lỗi, nút hiện g�
 Sửa **`src/config.ts`**:
 
 - `colors`: nền, giấy, hồng, màu chữ và chữ phụ.
-- `timing`: mở nắp 1300ms, ảnh bay dùng trung bình `flightMin`/`flightMax` (mặc định 4600ms), khoảng cách 600–900ms, mờ ảnh 1500ms, chữ bay 2200ms, trễ mỗi dòng 180ms và nhịp nhóm chữ 38ms; thời gian tính bằng mili giây. Các ảnh bay trong cùng thời lượng để giữ thứ tự đáp, ảnh bắt đầu cuối cùng cũng đáp cuối cùng.
+- `timing`: mở nắp 1300ms, ảnh bay dùng trung bình `flightMin`/`flightMax` (mặc định 4600ms), khoảng cách 600–900ms, mờ ảnh 1500ms; thời gian tính bằng mili giây. Mỗi dòng thư bay trong tối đa 650ms, bắt đầu theo mép giấy thay vì độ trễ riêng. Các ảnh bay trong cùng thời lượng để giữ thứ tự đáp, ảnh bắt đầu cuối cùng cũng đáp cuối cùng.
 - `mobileFlightConcurrency` / `desktopFlightConcurrency`: tối đa ảnh đang bay. Khi đạt giới hạn, hàng đợi đợi ảnh trước hoàn thành rồi mới cho ảnh tiếp theo bay.
 - `loadingConcurrency`, `imageTimeout`, `letterParticleLimit`: tải tài nguyên và hiệu năng. `imageTimeout` nằm trong `timing`.
 - `heartStyle`: độ nghiêng, kích thước ảnh lúc bay vào (`entryWidth`), nhịp đập, tốc độ trang trí nổi nhẹ và màu hào quang. Vị trí 40 ô được định nghĩa trong `src/heart-layout.ts`.

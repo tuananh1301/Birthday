@@ -77,7 +77,7 @@ export function PhotoStage({ photos, phase, reduced, onComplete, onOpen }: Props
     return () => { controller.abort(); animations.forEach(animation => animation.cancel()); };
   }, [photos, layout, onComplete]);
 
-  const heartWidth = Math.min(size.width - 54, size.height * .83, 545);
+  const heartWidth = Math.min(size.width - 20, (size.height - 28) * layout.columns / layout.rows, 720);
   const tile = heartWidth / layout.columns;
   const heartHeight = tile * layout.rows;
   const heartLeft = (size.width - heartWidth) / 2;
@@ -117,6 +117,6 @@ export function PhotoStage({ photos, phase, reduced, onComplete, onOpen }: Props
         <svg className="tap-hint" width="43" height="52" viewBox="0 0 43 52" fill="none" aria-hidden="true"><circle cx="18" cy="13" r="11" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 4"/><path d="M14 31V14a4 4 0 0 1 8 0v12-3a4 4 0 0 1 7 0v3a4 4 0 0 1 7 1v11c0 8-4 11-11 11h-3c-5 0-8-2-11-7l-6-9c-3-5 2-8 5-4l4 4" fill="#fffcf6" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/></svg>
       </button>}
     </div>
-    <div className="scene-foot" aria-live="polite">{phase === 'flying' ? <><span className="tiny-heart">♡</span><span>{arrived.size} / {layout.cells.length} mảnh ghép thương yêu</span></> : <span className="little-script">Mỗi mảnh ghép, một phần hạnh phúc</span>}</div>
+    <div className="scene-foot" aria-live="polite">{phase !== 'flying' && <span className="little-script">Mỗi mảnh ghép, một phần hạnh phúc</span>}</div>
   </div>;
 }

@@ -24,7 +24,7 @@ export async function prepareAssets(root = resolve('public')) {
     const results = await Promise.all(entries.map(entry => {
       const url = `${prefix}/${encodeURIComponent(entry.name)}`;
       if (entry.isDirectory()) return scan(join(dir, entry.name), url);
-      return entry.isFile() && /\.(jpe?g|png|webp|avif)$/i.test(entry.name) ? [url] : [];
+      return entry.isFile() && /\.(jpe?g|jfif|png|webp|avif)$/i.test(entry.name) ? [url] : [];
     }));
     return results.flat().sort();
   }

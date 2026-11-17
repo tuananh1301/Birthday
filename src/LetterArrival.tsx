@@ -5,7 +5,7 @@ import { Dove } from './Dove';
 type Props = {
   paper: RefObject<HTMLElement | null>;
   reduced: boolean;
-  onUnfold: () => void;
+  onUnfold: (animation?: Animation) => void;
   onComplete: () => void;
 };
 
@@ -96,8 +96,6 @@ export function LetterArrival({ paper, reduced, onUnfold, onComplete }: Props) {
         { width: `${rect.width}px`, transform: `translate(${rect.left}px,${rect.top - 8}px) scale(1)` },
       ], config.delivery.spread).finished;
       if (cancelled || completed) return;
-      onUnfold();
-      article.style.visibility = 'visible';
       const initialHeight = 26;
       const visibleHeight = Math.min(rect.height, Math.max(240, window.innerHeight - rect.top + 70));
       const crop = (height: number) => `inset(0px 0px ${Math.max(0, rect.height - height)}px 0px round 5px)`;
@@ -109,6 +107,8 @@ export function LetterArrival({ paper, reduced, onUnfold, onComplete }: Props) {
         { offset: .8, transform: 'none', clipPath: crop(initialHeight + (visibleHeight - initialHeight) * .82) },
         { offset: 1, transform: 'none', clipPath: crop(visibleHeight) },
       ], config.delivery.unfold, 'linear');
+      onUnfold(paperAnimation);
+      article.style.visibility = 'visible';
       play(packet, [{ opacity: 1 }, { opacity: 0 }], 1200);
       roller.current!.style.visibility = 'visible';
       const followEdge = () => {

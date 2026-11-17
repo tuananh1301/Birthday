@@ -5,6 +5,19 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { prepareAssets } from '../scripts/prepare-assets.mjs';
 
+test('JFIF photos are included instead of demo images', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'birthday-'));
+  try {
+    await mkdir(join(root, 'photos', 'album'), { recursive: true });
+    await writeFile(join(root, 'photos', 'memory.jfif'), 'photo');
+    await writeFile(join(root, 'photos', 'album', 'memory.JFIF'), 'photo');
+    const manifest = await prepareAssets(root);
+    assert.equal(manifest.demo, false);
+    assert.deepEqual(manifest.photos, ['photos/album/memory.JFIF', 'photos/memory.jfif']);
+    assert.deepEqual(JSON.parse(await readFile(join(root, 'photos-manifest.json'), 'utf8')), manifest);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
 test('quét ảnh thật, encode đường dẫn và giữ nguyên thư cá nhân', async () => {
   const root = await mkdtemp(join(tmpdir(), 'birthday-'));
   try {
