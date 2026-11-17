@@ -1,0 +1,14 @@
+.ambient{position:fixed;inset:0;contain:strict}
+.color-wash{position:absolute;width:min(115vw,1150px);height:min(110svh,1000px);border-radius:50%;opacity:.55;animation:mist-drift var(--mist-drift) ease-in-out infinite alternate;will-change:transform}
+.wash-rose{left:-47%;top:-27%;background:radial-gradient(ellipse,var(--mist-rose),transparent 66%)}
+.wash-peach{right:-48%;top:12%;background:radial-gradient(ellipse,var(--mist-peach),transparent 65%);animation-delay:-15s;animation-direction:alternate-reverse}
+.wash-sage{left:5%;bottom:-80%;background:radial-gradient(ellipse,var(--mist-sage),transparent 66%);opacity:.38;animation-delay:-23s}
+.ambient .ambient-heart,.ambient .ambient-star{animation:ambient-sway 18s ease-in-out infinite alternate}
+.ambient .two{animation-delay:-6s}.ambient .three{animation-delay:-11s}.ambient .four{animation-delay:-15s}
+.ambient .drifting-petal{top:0;width:10px;height:17px;border-radius:80% 12% 70% 22%;background:linear-gradient(135deg,#ebc0c980,#cb8c9d66);box-shadow:inset 1px 1px 3px #fff8;animation:petal-drift calc(var(--petal-fall) * var(--petal-duration)) linear infinite;animation-delay:var(--petal-delay);opacity:0}
+.ambient .light-mote{width:4px;height:4px;border-radius:50%;background:#c5a06f;box-shadow:0 0 10px 3px #ddbc902b;animation:mote-breathe var(--mote-glow) ease-in-out infinite;opacity:.16}
+@keyframes mist-drift{from{transform:translate3d(0,0,0) scale(.96)}to{transform:translate3d(18vw,12svh,0) scale(1.13)}}
+@keyframes ambient-sway{from{transform:translate3d(0,0,0) rotate(-5deg)}to{transform:translate3d(7px,-13px,0) rotate(6deg)}}
+@keyframes petal-drift{0%{transform:translate3d(-10px,-15svh,0) rotate(-25deg);opacity:0}12%{opacity:.38}50%{transform:translate3d(26px,48svh,0) rotate(48deg);opacity:.3}88%{opacity:.33}100%{transform:translate3d(-4px,115svh,0) rotate(115deg);opacity:0}}
+@keyframes mote-breathe{0%,100%{transform:translateY(0);opacity:.12}50%{transform:translateY(-14px);opacity:.4}}
+@media(prefers-reduced-motion:reduce){.ambient *{animation:none!important;will-change:auto}.ambient .drifting-petal{top:var(--petal-rest);opacity:.2;transform:rotate(25deg)}.color-wash{opacity:.38}}

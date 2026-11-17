@@ -1,0 +1,7 @@
+node_modules/
+dist/
+test-results/
+test-results-music-scroll/
+playwright-report/
+public/photos-manifest.json
+*.tsbuildinfo

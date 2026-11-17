@@ -1,0 +1,19 @@
+/* A photo heart made of little keepsakes, with a few quiet moving details. */
+.heart-aura{position:absolute;pointer-events:none;opacity:0;transition:opacity var(--heart-reveal);color:var(--heart-outline)}
+.heart .heart-aura{opacity:1}
+.heart-glow{position:absolute;inset:-9%;background:radial-gradient(ellipse,var(--heart-glow),transparent 68%);opacity:.28;filter:blur(14px)}
+.heart-thread{position:absolute;inset:-2%;width:104%;height:104%;overflow:visible;transform:rotate(-4deg)}
+.heart-thread path{fill:none;stroke:var(--heart-outline);stroke-width:.3;stroke-dasharray:1 1.2;opacity:.5;vector-effect:non-scaling-stroke}
+.heart-confetti{position:absolute;font-size:20px;line-height:1;animation:keepsake-float var(--heart-float) ease-in-out infinite;animation-delay:-1s}
+.confetti-0{left:0;top:14%;rotate:-20deg;font-size:26px}.confetti-1{right:2%;top:7%;font-size:22px;animation-delay:-3s}.confetti-2{right:-4%;top:57%;rotate:16deg;font-size:17px;animation-delay:-2s}.confetti-3{left:7%;top:69%;font-size:13px;animation-delay:-4s}.confetti-4{right:20%;bottom:1%;font-size:21px;rotate:14deg;animation-delay:-5s}.confetti-5{left:28%;top:-5%;font-size:15px}
+.memory.tile{padding:2px 2px 4px;border-radius:2px;background:#fffaf1;box-shadow:0 2px 5px #71504729,0 0 0 .5px #c2a09125}
+.memory.tile img{border-radius:1px}
+.memory.direct-tile{transition:none;will-change:auto}
+.memory.direct-tile img{object-fit:contain}
+.memory.direct-tile.is-flying{z-index:500!important;will-change:transform,opacity}
+.photo-scene .scene-heading{height:150px;flex-shrink:0;display:flex;flex-direction:column;justify-content:center}
+.heart .heart-group{animation:heartbeat var(--heart-breathe) ease-in-out infinite}
+.heart-hit .tap-hint{right:4%;bottom:12%}
+@keyframes keepsake-float{0%,100%{transform:translateY(0);opacity:.65}50%{transform:translateY(-6px);opacity:1}}
+@media(min-width:600px){.heart-confetti{font-size:28px}.confetti-3{font-size:17px}}
+@media(prefers-reduced-motion:reduce){.heart-confetti{animation:none}.heart-aura{transition-duration:.2s}}
