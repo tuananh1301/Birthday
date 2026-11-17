@@ -18,7 +18,15 @@ npm run build
 npm run preview
 ```
 
-Bản tĩnh nằm ở `dist/`. Có thể phục vụ bằng static hosting khi bạn muốn; dự án chưa được triển khai công khai. Không mở trực tiếp `index.html` bằng `file://` vì trình duyệt cần HTTP để đọc thư và manifest.
+Bản tĩnh nằm ở `dist/`. Không mở trực tiếp `index.html` bằng `file://` vì trình duyệt cần HTTP để đọc thư và manifest.
+
+## Deploy lên GitHub Pages
+
+Trong repository GitHub, vào **Settings → Pages → Build and deployment → Source**, chọn **GitHub Actions**. Push file `.github/workflows/deploy.yml` lên nhánh `main`, rồi theo dõi workflow trong tab **Actions**. Nếu file đã được push trước khi đổi Source, mở workflow và chọn **Run workflow**.
+
+Workflow tự cài dependencies, kiểm thử, tạo manifest ảnh, build với base `/Birthday/` và deploy **thư mục `dist/`** lên `https://tuananh1301.github.io/Birthday/`. Các lần push tiếp theo vào `main` sẽ tự cập nhật website. Nếu đổi tên repository, cập nhật `--base` trong workflow.
+
+Không chọn deploy trực tiếp thư mục gốc chứa mã nguồn: `index.html` gốc tham chiếu `/src/main.tsx`, chỉ chạy qua Vite; GitHub Pages cần bản JavaScript đã build trong `dist/`.
 
 ## Thay ảnh của hai vợ chồng
 
