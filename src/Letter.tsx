@@ -17,98 +17,67 @@ export function Letter({ text, reduced, onReplay }: Props) {
   const finishDelivery = useCallback(() => setDelivered(true), []);
   useEffect(() => {
     const element = content.current!;
-    if (!unfolding) { element.style.visibility = 'hidden'; return; }
+    element.style.visibility = 'hidden';
+    if (!unfolding) return;
     const article = paper.current!;
+    const paragraphs = [...element.querySelectorAll<HTMLElement>('.letter-paragraph')];
     const animations = new Set<Animation>();
-    const overlays = new Set<HTMLElement>();
+    const started = new Set<HTMLElement>();
     let cancelled = false;
+    let revealed = false;
+    let frame = 0;
     const reveal = () => {
-      if (cancelled) return;
+      if (cancelled || revealed) return;
+      revealed = true;
+      cancelAnimationFrame(frame);
+      animations.forEach(animation => animation.cancel());
+      paragraphs.forEach(paragraph => {
+        paragraph.style.opacity = '1';
+        paragraph.style.visibility = '';
+      });
       element.style.visibility = 'visible';
-      animations.forEach(a => a.cancel());
-      overlays.forEach(node => node.remove());
       setDone(true);
     };
-    // Measure the real text, then animate whole lines as the rolling edge reaches them.
-    element.style.visibility = 'hidden';
-    let frame = 0;
-    const begin = async () => {
-      await document.fonts.ready;
-      if (cancelled) return;
-      frame = requestAnimationFrame(() => {
-        if (reduced || !unroll.current || !('Segmenter' in Intl)) { reveal(); return; }
-        const node = element.firstChild;
-        if (!node) { reveal(); return; }
-        const segmenter = new Intl.Segmenter('vi', { granularity: 'grapheme' });
-        const range = document.createRange();
-        const base = article.getBoundingClientRect();
-        const computed = getComputedStyle(element);
-        const lines = new Map<number, { start: number; end: number }>();
-        for (const part of segmenter.segment(text)) {
-          if (!part.segment.trim()) continue;
-          range.setStart(node, part.index);
-          range.setEnd(node, part.index + part.segment.length);
-          const rect = range.getBoundingClientRect();
-          if (rect.top > window.innerHeight + 40) break;
-          if (rect.bottom < 0) continue;
-          const top = Math.round(rect.top);
-          const line = lines.get(top);
-          if (line) line.end = part.index + part.segment.length;
-          else if (lines.size < config.letterParticleLimit) lines.set(top, { start: part.index, end: part.index + part.segment.length });
-        }
-        const pending: { span: HTMLElement; top: number; index: number; started: boolean }[] = [];
-        for (const [index, line] of [...lines.values()].entries()) {
-          range.setStart(node, line.start);
-          range.setEnd(node, line.end);
-          const rect = range.getBoundingClientRect();
-          const span = document.createElement('span');
-          span.className = 'flying-letter';
-          span.setAttribute('aria-hidden', 'true');
-          span.textContent = text.slice(line.start, line.end);
-          Object.assign(span.style, { left: `${rect.left - base.left - article.clientLeft}px`, top: `${rect.top - base.top - article.clientTop}px`, font: computed.font, lineHeight: `${rect.height}px`, letterSpacing: computed.letterSpacing, color: computed.color, opacity: '0' });
-          article.appendChild(span);
-          overlays.add(span);
-          pending.push({ span, top: rect.top - base.top, index, started: false });
-        }
-        const followPaper = () => {
-          if (cancelled) return;
-          const rolling = unroll.current!;
-          if (rolling.playState === 'finished' || rolling.playState === 'idle') { reveal(); return; }
-          const insets = getComputedStyle(article).clipPath.split('round')[0].match(/[\d.]+px/g)?.map(Number.parseFloat) ?? [0];
-          const edge = article.getBoundingClientRect().height - (insets.length >= 3 ? insets[2] : insets[0]);
-          for (const line of pending) {
-            if (line.started || line.top > edge) continue;
-            line.started = true;
-            const animation = line.span.animate([
-              { opacity: 0, transform: `translate(${line.index % 2 ? 24 : -24}px, 14px)` },
-              { opacity: 1, transform: 'translate(0, 0)' },
-            ], { duration: Math.min(config.timing.letterFlight, 650), easing: 'cubic-bezier(.25,.5,.3,1)', fill: 'forwards' });
-            animations.add(animation);
-          }
-          frame = requestAnimationFrame(followPaper);
-        };
-        followPaper();
-      });
+    const followPaper = () => {
+      if (cancelled || revealed) return;
+      const rolling = unroll.current;
+      if (reduced || !rolling || rolling.playState === 'finished' || rolling.playState === 'idle') { reveal(); return; }
+      const box = article.getBoundingClientRect();
+      const insets = getComputedStyle(article).clipPath.split('round')[0].match(/[\d.]+px/g)?.map(Number.parseFloat) ?? [0];
+      const edge = box.bottom - (insets.length >= 3 ? insets[2] : insets[0]);
+      let active = 0;
+      for (const [index, paragraph] of paragraphs.entries()) {
+        if (started.has(paragraph)) continue;
+        // Native inline text keeps its font and wrapping even on mobile browsers.
+        const firstLine = paragraph.getClientRects()[0];
+        if (!firstLine || firstLine.top > window.innerHeight + 40) break;
+        if (firstLine.top > edge || active >= config.letterParticleLimit) continue;
+        started.add(paragraph);
+        active++;
+        paragraph.style.visibility = 'visible';
+        const animation = paragraph.animate([
+          { opacity: 0, left: index % 2 ? '8px' : '-8px', top: '10px' },
+          { opacity: 1, left: '0px', top: '0px' },
+        ], { duration: Math.min(config.timing.letterFlight, 650), easing: 'cubic-bezier(.25,.5,.3,1)', fill: 'forwards' });
+        animations.add(animation);
+      }
+      frame = requestAnimationFrame(followPaper);
     };
-    void begin();
-    // Resize/scroll during assembly reveals the real text immediately: no stale coordinates.
-    let measuredWidth = element.clientWidth;
-    const observer = new ResizeObserver(() => {
-      const width = element.clientWidth;
-      if (width !== measuredWidth && overlays.size) reveal();
-      measuredWidth = width;
+    void document.fonts.ready.then(() => {
+      if (!cancelled && !revealed) frame = requestAnimationFrame(followPaper);
     });
-    observer.observe(element);
     window.addEventListener('scroll', reveal, { passive: true });
     window.addEventListener('resize', reveal, { passive: true });
     return () => {
       cancelled = true;
       cancelAnimationFrame(frame);
-      observer.disconnect();
       window.removeEventListener('scroll', reveal);
       window.removeEventListener('resize', reveal);
-      animations.forEach(a => a.cancel());
-      overlays.forEach(node => node.remove());
+      animations.forEach(animation => animation.cancel());
+      paragraphs.forEach(paragraph => {
+        paragraph.style.opacity = '';
+        paragraph.style.visibility = '';
+      });
     };
   }, [text, reduced, unfolding]);
 
@@ -126,7 +95,7 @@ export function Letter({ text, reduced, onReplay }: Props) {
         <path d="m34 124 15-4m-16 8 15-4" stroke="#c9a684" strokeWidth="2" strokeLinecap="round" />
       </svg>
       <div className="paper-tape" aria-hidden="true" />
-      <div ref={content} className="letter-text">{text}</div>
+      <div ref={content} className="letter-text">{text.split(/(\n+)/).map((part, index) => part.startsWith('\n') ? part : <span key={index} className={done ? 'letter-paragraph' : 'letter-paragraph flying-letter'}>{part}</span>)}</div>
       <div className="letter-end" aria-hidden="true"><span /><div className="letter-wax-seal"><span>♡</span></div><span /></div>
     </article>
     <button className="replay-button" onClick={onReplay} disabled={!delivered}><span aria-hidden="true">↺</span> Xem lại món quà</button>

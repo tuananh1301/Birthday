@@ -1,4 +1,5 @@
 .letter-scene{padding-top:16px}
+.letter-text .flying-letter{position:relative;white-space:inherit;opacity:0;will-change:opacity,left,top}
 .letter-paper{background-color:var(--paper);background-image:repeating-linear-gradient(0deg,#b5997a05 0px,#b5997a05 1px,transparent 1px,transparent 4px),radial-gradient(ellipse at 0 0,#f3e3cc38,transparent 65%);border-color:#e0c9b896;border-radius:3px 3px 12px 3px;box-shadow:0 22px 58px #79544812,0 3px 8px #79544809,inset 0 0 35px #e5cda91a;padding-top:32px}
 .letter-paper::before{content:'';position:absolute;inset:11px;border:1px solid #d9b7a552;border-radius:1px 1px 5px 1px;pointer-events:none;z-index:-1}
 .letter-paper::after{content:'';position:absolute;bottom:0;right:0;width:29px;height:29px;background:linear-gradient(135deg,transparent 47%,#dfc9b5 49%,#f9ecd8 52%,#fffaf1 80%);clip-path:polygon(100% 0,100% 100%,0 100%);border-bottom-right-radius:11px;pointer-events:none;opacity:.7}
